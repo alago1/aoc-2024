@@ -16,13 +16,31 @@ except ImportError:
 
 def parse(filename):
     with open(filename) as file:
-        return [x.strip() for x in file.readlines()]
+        return [x.strip().split() for x in file.readlines()]
 
-def part1(x):
-    pass
+def is_safe(level):
+    diff = list([x - y for x, y in zip(level, level[1:])])
+    monotonic = all([v > 0 for v in diff]) or all([v < 0 for v in diff])
+    in_range = all([1 <= abs(x) <= 3 for x in diff])
+    return monotonic and in_range
 
-def part2(x):
-    pass
+def part1(lines):
+    levels = [[int(x) for x in line] for line in lines]
+    return sum([is_safe(level) for level in levels])
+
+def part2(lines):
+    levels = [[int(x) for x in line] for line in lines]
+    count = 0
+    for level in levels:
+        if is_safe(level):
+            count += 1
+            continue
+        for j in range(len(level)):
+            if is_safe(level[:j] + level[j+1:]):
+                count += 1
+                break
+    
+    return count
 
 if __name__ == '__main__':
     x = parse('input.txt')
